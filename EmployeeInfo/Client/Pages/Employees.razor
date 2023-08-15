@@ -1,0 +1,81 @@
+﻿@page "/employees"
+
+<PageTitle>Manage Employess</PageTitle>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h5>Manage Employees</h5>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card" style="max-width: 90%;">
+                    <div class="card-header">
+                        <h5>Create Employee</h5>
+                    </div>
+                    <div class="card-body">
+                        <EditForm Model="NewEmployee" OnValidSubmit=@HandleSubmit>
+                            <ValidationSummary />
+                            <div class="row m-1">
+                                <div class="col m-1">
+                                    <label for="firstnamefield">First Name</label>
+                                    <InputText class="w-100" id="firstnamefield" @bind-Value="@NewEmployee.FirstName" />
+                                </div>
+                                <div class="col m-1">
+                                    <label for="lastnamefield">Last Name</label>
+                                    <InputText class="w-100" id="lastnamefield" @bind-Value="@NewEmployee.LastName" />
+                                </div>
+                            </div>
+                            <div class="row m-1">
+                                <div class="col">
+                                    <label for="emailfield">Email</label>
+                                    <InputText class="w-100" id="emailfield" @bind-Value="@NewEmployee.Email" />
+                                </div>
+                                <div class="col">
+                                    <label for="salaryfield">Base Salary</label>
+                                    <InputNumber class="w-100" id="salaryfield" @bind-Value="@NewEmployee.Salary.BasePay" />
+                                </div>
+                            </div>
+                            <div class="row m-1">
+                                <div class="col">
+                                    <label for="manageridfield">Manager Id</label>
+                                    <InputNumber class="w-100" id="manageridfield" @bind-Value="@NewEmployee.ManagerEmployeeId"/>
+                                </div>
+                            </div>
+                            <div class="row m-3">
+                                <div class="col d-flex justify-content-center align-content-center">
+                                    <button class="btn btn-primary w-100" type="submit">Create</button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class=" col">
+                @if(AllEmployees != null)
+                {
+                    @foreach (var e in AllEmployees)
+                    {
+                        <EditableEmployee Employee=e/>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    List<Employee>? AllEmployees { get; set; }
+
+    protected Employee NewEmployee { get; set; } = new Employee();
+
+    protected async Task HandleSubmit()
+    {
+        NewEmployee = new Employee();
+    }
+
+}

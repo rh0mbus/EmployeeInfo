@@ -1,0 +1,62 @@
+﻿@inject IJSRuntime JsRuntime
+@inject HttpClient HttpClient
+
+<div class="card m-5" style="max-width: 80%;">
+    <div class="card-header">
+        <h5>@Employee?.FirstName @Employee?.LastName</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <strong>Current team: </strong>
+            </div>
+            <div class="col">
+                <span>@Employee?.Team.Name</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <strong>Employee Type: </strong>
+            </div>
+            <div class="col">
+                <span>@Employee?.Type</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <strong>Email: </strong>
+            </div>
+            <div class="col">
+                <span>@Employee?.Email</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <strong>Phone: </strong>
+            </div>
+            <div class="col">
+                <span>@Employee?.CompanyPhone</span>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary">Edit</button>
+            <button type="button" class="btn btn-primary" @onclick=DeleteEmployee>Remove</button>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public Employee? Employee { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    async void DeleteEmployee()
+    {
+        //await JsRuntime.InvokeVoidAsync("alert", $"You've been warned, {Employee?.FirstName}!");
+        await HttpClient.DeleteAsync($"api/Employee/DeleteEmployee/{Employee?.Id}");
+
+    }
+}

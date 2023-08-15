@@ -1,0 +1,140 @@
+﻿@page "/payroll"
+
+<PageTitle>Employee Payroll</PageTitle>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h5>Employee Payroll Information</h5>
+            <div class="card text-dark bg-light mb-3" style="min-width: 100%;">
+                <div class="card-header fw-bold">Payee Details</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Position</th>
+                                <th scope="col">Base Salary</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>@Employee?.FirstName @Employee?.LastName</th>
+                                <td>@Employee?.Title</td>
+                                <td>
+                                    @Employee?.Salary.BasePay.ToString("C",
+                                    new System.Globalization.CultureInfo("en-US"))
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h5 class="card-title">Payout Details</h5>
+                    <div class="scrollable">
+                        <div class="card">
+                            <div class="card-body">
+                                @foreach (var day in PayDates)
+                                {
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Amount</th>
+                                                <th scope="col">Date</th>
+                                                <th scope="col">Hours</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    @GetPayoutAmount().ToString("C",
+                                                    new System.Globalization.CultureInfo("en-US"))
+                                                </td>
+                                                <td>@day.Date.ToShortDateString()</td>
+                                                <td>@HoursInWorkWeek</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    protected Employee? Employee { get; set; }
+
+    Salary? EmployeeSalary { get; set; }
+
+    DateTime placeholderDate { get; set; } = DateTime.Now;
+
+    float totalDeductions { get; set; }
+    string DaysString { get; set; } = string.Empty;
+
+    int NumPayDays { get; set; } = 0;
+    int HoursInWorkWeek = 40;
+
+
+
+    private DateTime FirstPay;
+
+    private List<DateTime> PayDates = new List<DateTime>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Employee != null)
+        {
+            EmployeeSalary = Employee?.Salary;
+            totalDeductions = (float)Employee?.Salary.Deductions;
+            FirstPay = Employee.HireDate;
+        }
+
+        GetPaydaysSinceHire();
+        AddPayoutsToList();
+    }
+
+    protected void GetPaydaysSinceHire()
+    {
+        var Days = Employee?.HireDate;
+        var today = DateTime.Now;
+        var TotalDays = today - Days;
+        var resultWeeks = TotalDays / 14 ;
+        NumPayDays = resultWeeks.Value.Days;
+        if (resultWeeks != null)
+            DaysString = Math.Floor(resultWeeks.Value.TotalDays).ToString();
+    }
+
+    protected void AddPayoutsToList()
+    {
+        if (Employee == null)
+            return;
+
+        DateTime HireDate = Employee.HireDate;
+
+        for (int i = 0; i < NumPayDays; i++)
+        {
+
+            HireDate = HireDate.AddDays(14);
+            PayDates.Add(HireDate);
+        }
+
+        PayDates.Reverse();
+
+    }
+
+    double GetPayoutAmount()
+    {
+        if(Employee != null)
+        {
+            var payAmount = (Employee.Salary.BasePay / 26) - (Employee.Salary.Deductions / 26);
+
+            return payAmount;
+        }
+        return -1;
+    }
+
+
+}

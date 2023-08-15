@@ -1,0 +1,85 @@
+﻿<div class="m-2 card text-center">
+    <div class="card-header">
+        <h5 class="card-title">@CurrentTask?.Name</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">@CurrentTask?.Description</p>
+        @if(CurrentTask?.isTrainingTask == true)
+        {
+            <p class="card-text small"style="color: dimgrey;">
+                This task is a training task
+            </p>
+        }
+        @if(CurrentTask?.isCompleted == true)
+        {
+            <button class="btn btn-success disabled">Task completed</button>
+        }
+        else
+        {
+            <button class="btn btn-primary" @onclick="MarkComplete">Complete task</button>
+        }
+
+    </div>
+    <div class="card-footer text-muted">
+        @switch(PastDue)
+        {
+            case -1:
+                <small>Due - <strong>2 days ago</strong></small>
+                break;
+            case 0:
+                <small>Due - <strong>Today</strong></small>
+                break;
+            case 1:
+                <small>Due - <strong>in @DaysRemaining days</strong></small>
+                break;
+            default: break;
+        }
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public TodoTask? CurrentTask { get; set; }
+
+    int PastDue;
+
+    int DaysRemaining;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(CurrentTask != null && CurrentTask?.DueDate == DateTime.Today)
+        {
+            PastDue = 0;
+            GetDueDate();
+        }
+        else if (CurrentTask != null && CurrentTask?.DueDate < DateTime.Today)
+        {
+            PastDue = -1;
+            GetDueDate();
+        }
+        else if (CurrentTask != null && CurrentTask?.DueDate > DateTime.Today)
+        {
+            PastDue = 1;
+            GetDueDate();
+        }
+    }
+
+    protected void GetDueDate()
+    {
+        if(CurrentTask != null)
+        {
+            var days = CurrentTask.DueDate - DateTime.Now;
+            DaysRemaining = days.Days + 1;
+        }
+    }
+
+    protected void MarkComplete()
+    {
+        if(CurrentTask != null)
+        {
+            CurrentTask.isCompleted = true;
+        }
+    }
+}

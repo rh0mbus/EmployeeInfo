@@ -1,0 +1,38 @@
+﻿@page "/training"
+
+<PageTitle>@Employee?.FirstName - Training</PageTitle>
+
+<div class="container" style="max-height: 200vw; overflow-x: hidden;">
+    <div class="row">
+        <div class="col">
+            <h5>Training Materials</h5>
+            <p>
+                Here you will find a selection of useful training content
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <TrainingMaterial Title="Welcome to the team!"
+                              Description="Please take a moment to complete the steps in this document to get setup!"
+                              ImageName="welcome"
+                              TimeToComplete="10"
+                              MaterialName="trainingMat1" />
+            <TrainingMaterial Title="Workplace Safety"
+                              Description="Your safety is important to us. Take some time to familiarize yourself with our workplace policies."
+                              ImageName="harassment"
+                              TimeToComplete="10"
+                              MaterialName="trainingMat2" />
+            <TrainingMaterial Title="Information Security and You"
+                              Description="Security starts with you! Following the practices outlined in this documemnt will help to protect you and the company from nefarious entities."
+                              ImageName="security"
+                              TimeToComplete="15"
+                              MaterialName="trainingMat3" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    protected Employee? Employee { get; set; }
+}

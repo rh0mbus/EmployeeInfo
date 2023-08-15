@@ -1,0 +1,109 @@
+﻿@page "/teamhome"
+
+<PageTitle>@Employee?.FirstName - Team Landing Page </PageTitle>
+
+<div class="container">
+    <div class="row">
+        <div class="col  d-flex justify-content-center">
+            <div class="card" style="background-color: @Color color: white;">
+                <div class="card-header">
+                    <h2 class="">Your team - @Employee?.Team.Name</h2>
+                </div>
+                <div class="card-body text-black" style="background-color: white;">
+                    <div class="row">
+                        <div class="col">
+                            <img src=@($"./img/{Employee?.Team.Name}.png") class="img-fluid rounded float-start" />
+                        </div>
+                        <div class="col">
+                            <strong>Members: </strong>@Employees.Where(e => e.Team.Name == Employee?.Team.Name).Count()
+                        </div>
+                        <div class="col d-flex flex-column align-content-center align-items-center text-nowrap">
+                            @foreach (var employee in Employees)
+                            {
+                                if (employee.Team.Name == Employee?.Team.Name)
+                                {
+                                    if (employee.FirstName == Employee?.FirstName)
+                                    {
+                                        <strong>
+                                            @Employee?.FirstName @Employee?.LastName
+                                        </strong>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @employee?.FirstName @employee?.LastName
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="row mt-4">
+                                <h3>Details</h3>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col">
+                                    <strong>Current project:</strong>
+                                </div>
+                                <div class="col">
+                                    Database migration
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-black-50">
+                                    A UI driven application for kicking off database migrations.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+
+        @foreach (var project in Projects)
+        {
+            if (project.TeamId == Employee?.Team.Name)
+            {
+                continue;
+            }
+
+            <div class="col-12 col-md-4">
+                <TeamAtAGlance Team=@project.TeamId
+                               ProjectName="@project.Name" />
+            </div>
+        }
+
+    </div>
+
+
+
+</div>
+
+@code {
+    [CascadingParameter]
+    protected Employee? Employee { get; set; }
+
+    [CascadingParameter]
+    protected List<Employee> Employees { get; set; } = new List<Employee>();
+
+    [CascadingParameter]
+    protected List<Project> Projects { get; set; } = new List<Project>();
+
+    protected string Color { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Employee != null)
+        {
+            Color = Employee?.Team.Color;
+        }
+        else
+        {
+            Color = "rbg(75, 75, 75);";
+        }
+    }
+}

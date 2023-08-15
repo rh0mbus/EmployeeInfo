@@ -1,0 +1,71 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <div class="row">
+            <a class="navbar-brand " href=""><span class="brand fs-2">Shiftly</span></a>
+        </div>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="tasks">
+                <span class="oi oi-list" aria-hidden="true"></span> Tasks
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="payroll">
+                <span class="oi oi-envelope-closed" aria-hidden="true"></span> Payroll
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="ptorequests">
+                <span class="oi oi-clock" aria-hidden="true"></span> Time Requests
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="training">
+                <span class="oi oi-briefcase" aria-hidden="true"></span> Training Materials
+            </NavLink>
+        </div>
+        @*This is use for the teams current projects and links to them*@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="teamhome">
+                <span class="oi oi-compass" aria-hidden="true"></span> Team Landing Page
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    protected Employee? Employee { get; set; }
+
+    private bool collapseNavMenu = true;
+
+    private bool showAdminActions = false;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Employee?.Type == EmployeeType.TeamLeader || Employee?.Type == EmployeeType.Admin)
+            showAdminActions = true;
+        else
+            showAdminActions = false;
+    }
+}

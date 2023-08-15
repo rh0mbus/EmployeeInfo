@@ -1,0 +1,232 @@
+﻿@inherits LayoutComponentBase
+@inject HttpClient Http
+
+<div class="page">
+    <CascadingValue Value=@CurrentEmployee>
+        <CascadingValue Value=@Employees>
+            <CascadingValue Value="Projects">
+                <div class="sidebar">
+                    <NavMenu />
+                </div>
+                <main>
+                    <div class="top-row px-4 hider">
+                        @if (CurrentEmployee == null)
+                        {
+                            <span>No user found!</span>
+                        }
+                        else
+                        {
+                            <span class="oi oi-chevron-right"> Welcome @CurrentEmployee.FirstName! - User Logged in at: @currentTime.ToString("F")</span>
+                        }
+                    </div>
+                    <article class="content px-4">
+                        @Body
+                    </article>
+                </main>
+            </CascadingValue>
+        </CascadingValue>
+    </CascadingValue>
+</div>
+
+@code {
+    DateTime currentTime = DateTime.Now;
+
+    protected List<Employee> Employees = new List<Employee>();
+
+    protected List<Project> Projects = new List<Project>();
+
+    protected Employee CurrentEmployee = new Employee();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        // No DB or auth will be used, mock data instead
+        Employees.Add(new Employee
+            {
+                Id = 1,
+                FirstName = "Adam",
+                LastName = "Jensen",
+                Team = new Team { Id = 1, Name = "Sapphire", Color = "rgb(0, 11, 100);" },
+                VacationHours = 120.0f,
+                SickHours = 150.0f,
+                Title = "Software Engineer II",
+                Region = "US East",
+                ManagerEmployeeId = 2,
+                HireDate = new DateTime(2022, 6, 5),
+                Email = "ajensen@myBiz.com",
+                CompanyPhone = "518-792-2285",
+                Salary = new Salary
+                {
+                    BasePay = 90000,
+                    Deductions = 35000,
+                },
+                Type = EmployeeType.Admin,
+                EmployeeTasks = new List<TodoTask>()
+                {
+                    new TodoTask
+                    {
+                        Id = 1,
+                        Name = "Familiarize Youself",
+                        Description =  "Look around and get a feel for the site",
+                        DueDate = DateTime.Now.AddDays(6),
+                        AssignmentDate = DateTime.Now,
+                        CompletedDate  = DateTime.Now,
+                        isTrainingTask = false,
+                        isCompleted = true
+                    },
+                    new TodoTask
+                    {
+                        Id = 2,
+                        Name = "Go over training materials",
+                        Description =  "Look through the training materials listed in the training materials section.",
+                        DueDate = new DateTime(2023, 7, 1),
+                        AssignmentDate = DateTime.Now,
+                        isTrainingTask = true,
+                    },
+                    new TodoTask
+                    {
+                        Id = 3,
+                        Name = "Check out the landing page",
+                        Description =  "Look over the team landing page to get to know your fellow teams.",
+                        DueDate = DateTime.Today,
+                        AssignmentDate = DateTime.Now,
+                        isTrainingTask = true,
+                    }
+                }
+            });
+
+        Employees.Add(new Employee
+            {
+                Id = 2,
+                FirstName = "Chris",
+                LastName = "Redfield",
+                Team = new Team { Id = 2, Name = "Ruby", Color = "rgb(152, 4, 6);" },
+                VacationHours = 120.0f,
+                SickHours = 150.0f,
+                Title = "Software Engineer III",
+                ManagerEmployeeId = 1,
+                HireDate = new DateTime(2022, 2, 2),
+                Email = "credfield@myBiz.com",
+                CompanyPhone = "5183334444",
+                Salary = new Salary
+                {
+                    BasePay = 100000,
+                    Deductions = 350,
+                },
+                Type = EmployeeType.Admin,
+            });
+
+        Employees.Add(new Employee
+            {
+                Id = 3,
+                FirstName = "Commander",
+                LastName = "Shephard",
+                Team = new Team { Id = 3, Name = "Amethyst", Color = "rgb(56, 29, 76);" },
+                VacationHours = 120.0f,
+                SickHours = 150.0f,
+                Title = "Software Engineer III",
+                ManagerEmployeeId = 1,
+                HireDate = new DateTime(2022, 2, 2),
+                Email = "normandy@myBiz.com",
+                CompanyPhone = "5183334444",
+                Salary = new Salary
+                {
+                    BasePay = 100000,
+                    Deductions = 350,
+                },
+                Type = EmployeeType.Admin,
+            });
+
+        Employees.Add(new Employee
+            {
+                Id = 4,
+                FirstName = "Lara",
+                LastName = "Croft",
+                Team = new Team { Id = 4, Name = "Emerald", Color = "rgb(7, 53, 40);" },
+                VacationHours = 120.0f,
+                SickHours = 150.0f,
+                Title = "Software Engineer III",
+                ManagerEmployeeId = 1,
+                HireDate = new DateTime(2022, 2, 2),
+                Email = "lcroft@myBiz.com",
+                CompanyPhone = "5183334444",
+                Salary = new Salary
+                {
+                    BasePay = 100000,
+                    Deductions = 350,
+                },
+                Type = EmployeeType.Admin,
+            });
+
+        Employees.Add(new Employee
+            {
+                Id = 5,
+                FirstName = "Jill",
+                LastName = "Valentine",
+                Team = new Team { Id = 4, Name = "Sapphire", Color = "rgb(0, 11, 100);" },
+                VacationHours = 120.0f,
+                SickHours = 150.0f,
+                Title = "Software Engineer III",
+                ManagerEmployeeId = 1,
+                HireDate = new DateTime(2022, 2, 2),
+                Email = "lcroft@myBiz.com",
+                CompanyPhone = "5183334444",
+                Salary = new Salary
+                {
+                    BasePay = 100000,
+                    Deductions = 350,
+                },
+                Type = EmployeeType.Admin,
+            });
+
+        Employees.Add(new Employee
+            {
+                Id = 6,
+                FirstName = "Claire",
+                LastName = "Redfield",
+                Team = new Team { Id = 4, Name = "Amethyst", Color = "rgb(56, 29, 76);" },
+                VacationHours = 120.0f,
+                SickHours = 150.0f,
+                Title = "Software Engineer III",
+                ManagerEmployeeId = 1,
+                HireDate = new DateTime(2022, 2, 2),
+                Email = "clredfield@myBiz.com",
+                CompanyPhone = "5183334444",
+                Salary = new Salary
+                {
+                    BasePay = 100000,
+                    Deductions = 350,
+                },
+                Type = EmployeeType.Admin,
+            });
+
+        Employees.Add(new Employee
+            {
+                Id = 7,
+                FirstName = "Joanna",
+                LastName = "Dark",
+                Team = new Team { Id = 4, Name = "Ruby", Color = "rgb(100, 0, 8);" },
+                VacationHours = 120.0f,
+                SickHours = 150.0f,
+                Title = "Software Engineer V",
+                ManagerEmployeeId = 1,
+                HireDate = new DateTime(2022, 2, 2),
+                Email = "fusrohdah@myBiz.com",
+                CompanyPhone = "5183334444",
+                Salary = new Salary
+                {
+                    BasePay = 190000,
+                    Deductions = 550,
+                },
+                Type = EmployeeType.Admin,
+            });
+
+        Projects.Add(new Project { Id = 0, Name = "Document Analytics Dashboard", Description = "A that front end for an OCR solution to scan digital documents for the desired criteria.", TeamId = "Sapphire" });
+        Projects.Add(new Project { Id = 1, Name = "Widget Dashboard", Description = "A projects used for visualizing user data to identify problem areas where data shouldn't be exposed.", TeamId = "Ruby" });
+        Projects.Add(new Project { Id = 2, Name = "Client Dashboard", Description = "A widget based dashboard and landing page for customers to kick off data transfers from one location to another.", TeamId = "Emerald" });
+        Projects.Add(new Project { Id = 3, Name = "Widget Toolkit", Description = "A standard library of widgets that can be used by the company across all of their applications.", TeamId = "Amethyst" });
+
+        CurrentEmployee = Employees[0];
+    }
+}

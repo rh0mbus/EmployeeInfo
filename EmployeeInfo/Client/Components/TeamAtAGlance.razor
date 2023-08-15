@@ -1,0 +1,55 @@
+﻿<div class="card text-white mb-3" style="background-color: @($"{Color}")">
+    <div class="card-header">@Team</div>
+    <div class="card-body text-black" style="background-color: white;">
+        <div class="row mt-2 mb-3">
+            <div class="row">
+                <div class="col">
+                    <strong>Members: </strong>
+                    <div>
+                        @foreach (var member in Employees)
+                        {
+                            if (member.Team.Name == Team)
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <span>@member.FirstName @member.LastName</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <span class="m-1"><strong>Current project: </strong> @ProjectName</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    protected List<Employee> Employees { get; set; } = new List<Employee>();
+
+    [Parameter]
+    public string Team { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ProjectName { get; set; } = string.Empty;
+
+    string Color = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        foreach (var e in Employees)
+        {
+            if(e.Team.Name == Team)
+            {
+                Color = e.Team.Color;
+                break;
+            }
+        }
+    }
+}

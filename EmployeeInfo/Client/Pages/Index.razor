@@ -1,0 +1,47 @@
+﻿@page "/"
+
+<PageTitle>@EmployeeName - Home</PageTitle>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="col d-flex justify-content-center align-content-center">
+                    <TaskSummary EmployeeTasks=@Employee?.EmployeeTasks />
+                </div>
+                <div class="col d-flex justify-content-center align-content-center">
+                    <PTORequestSummary PTORequests=@Employee?.PTORequests />
+                </div>
+                <div class="col d-flex justify-content-center align-content-center">
+                    <TrainingSummary TodoTasks=@Employee?.EmployeeTasks />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col d-flex justify-content-center">
+                    <EmployeeSummary Employee=@Employee />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    protected Employee? Employee { get; set; }
+
+    [Parameter]
+    public string EmployeeName { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Employee != null)
+            EmployeeName = Employee.FirstName;
+    }
+}

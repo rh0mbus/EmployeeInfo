@@ -1,0 +1,114 @@
+﻿<div class="card text-dark bg-light mb-3" style="min-width: 90%;">
+    <div class="card-header"><h4>Employee Overview</h4></div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Team</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr>
+                    <td>@Employee?.FirstName</td>
+                    <td>@Employee?.LastName</td>
+                    <td>@Employee?.Team.Name</td>
+                </tr>
+                <tr>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row m-2">
+            <div class="col d-flex justify-content-center align-content-center mt-5">
+                <strong>
+                    General Information
+                </strong>
+            </div>
+        </div>
+        <div class="row" style="min-width: 100%;">
+            <div class="col">
+                <strong>
+                    Position:
+                </strong>
+            </div>
+            <div class="col">
+                @Employee?.Title
+            </div>
+        </div>
+        <div class="row" style="min-width: 100%;">
+            <div class="col">
+                <strong>
+                    Manager:
+                </strong>
+            </div>
+            <div class="col">
+                @ManagerName
+            </div>
+        </div>
+        <div class="row" style="min-width: 100%;">
+            <div class="col">
+                <strong>
+                    Region:
+                </strong>
+            </div>
+            <div class="col">
+                @Employee?.Region
+            </div>
+        </div>
+        <div class="row m-2">
+            <div class="col d-flex justify-content-center align-content-center mt-5">
+                <strong>
+                    Contact Information
+                </strong>
+            </div>
+        </div>
+        <div class="row" style="min-width: 100%;">
+            <div class="col">
+                <strong>
+                    Email:
+                </strong>
+            </div>
+            <div class="col">
+                @Employee?.Email
+            </div>
+        </div>
+        <div class="row" style="min-width: 100%;">
+            <div class="col">
+                <strong>
+                    Phone:
+                </strong>
+            </div>
+            <div class="col">
+                @Employee?.CompanyPhone
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public List<Employee>? Employees { get; set; }
+
+    [Parameter]
+    public Employee? Employee { get; set; }
+
+    private Employee? Manager;
+
+    private string ManagerName { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        GetManager();
+    }
+
+    protected void GetManager()
+    {
+        Manager = Employees?.Where<Employee>(e => e.Id == Employee?.ManagerEmployeeId).FirstOrDefault<Employee>();
+        if(Manager != null)
+        {
+            ManagerName = Manager.FirstName + " " + Manager.LastName;
+        }
+    }
+}

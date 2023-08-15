@@ -1,0 +1,30 @@
+﻿@if (EmployeeTasks?.Count() <= 0)
+{
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">
+            <h5 class="card-title">Tasks Summary</h5>
+        </div>
+        <div class="card-body">
+            <span>You have no tasks to complete!</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">
+            <h5 class="card-title">Tasks Summary</h5>
+        </div>
+        <div class="card-body">
+            <p>
+                You currenly have <bold class="fw-bold" style="color:red;">@EmployeeTasks?.Count</bold> tasks assigned to you.
+            </p>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public List<TodoTask>? EmployeeTasks { get; set; }
+}

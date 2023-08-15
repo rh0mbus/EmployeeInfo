@@ -1,0 +1,45 @@
+﻿@if (TrainingTasks?.Count() <= 0)
+{
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">
+            <h5 class="card-title">Training Summary</h5>
+        </div>
+        <div class="card-body">
+            <span>You currently have no assignments that must be completed</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">
+            <h5 class="card-title">Training Summary</h5>
+        </div>
+        <div class="card-body">
+            <p>
+                You currenly have <bold class="fw-bold" style="color:red;">@TrainingTasks?.Count</bold> training tasks assigned to you.
+            </p>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public List<TodoTask>? TodoTasks { get; set; }
+
+    public List<TodoTask> TrainingTasks { get; set; } = new List<TodoTask>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        TrainingTasks.Clear();
+        if(TodoTasks != null)
+        {
+            foreach (var task in TodoTasks)
+            {
+                if (task.isTrainingTask)
+                    TrainingTasks.Add(task);
+            }
+        }
+    }
+}

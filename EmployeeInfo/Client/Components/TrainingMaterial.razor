@@ -1,0 +1,42 @@
+﻿@*TODO// Replace the hard coded cards with the component version*@
+
+<div class="row">
+    <div class="col">
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src=@($"./img/{ImageName}.jpg") class="img-fluid rounded-start" alt=@($"An image of a {ImageName}")>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">@Title</h5>
+                        <p class="card-text">@Description</p>
+                        <p class="card-text"><small class="text-muted">Time to complete - @TimeToComplete minutes</small></p>
+                        <div class="btn-group">
+                            <a href=@($"./{MaterialName}.pdf") download class="btn btn-outline-primary" aria-current="page">Get Materials</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ImageName { get; set; } = string.Empty;
+
+
+    [Parameter]
+    public string MaterialName { get; set; } = string.Empty;
+
+    [Parameter]
+    public int TimeToComplete { get; set; } = 10;
+
+}

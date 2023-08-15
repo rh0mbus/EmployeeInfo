@@ -1,0 +1,49 @@
+﻿@page "/tasks"
+
+<PageTitle>@Employee?.FirstName - Tasks</PageTitle>
+<div class="container overflow-scroll nox">
+    <div class="row mb-3">
+        <div class="col">
+            <h5>Assigned Tasks</h5>
+        </div>
+    </div>
+    <div class="row" style="max-height: 100vw; min-width: 100%;">
+        <div class="col">
+            @if (EmployeeTasks.Count == 0)
+            {
+
+                <p>You have no tasks to complete!</p>
+
+            }
+            else
+            {
+                @foreach (var task in EmployeeTasks)
+                {
+                    <EmployeeTask CurrentTask=@task />
+                }
+            }
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    [CascadingParameter]
+    protected Employee? Employee { get; set; }
+
+    protected List<TodoTask> EmployeeTasks { get; set; } = new List<TodoTask>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Employee != null)
+            EmployeeTasks = Employee.EmployeeTasks;
+    }
+
+
+}

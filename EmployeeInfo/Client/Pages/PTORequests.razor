@@ -1,0 +1,263 @@
+﻿@page "/ptorequests"
+
+<PageTitle>PTO Requests</PageTitle>
+
+@* TODO: Update the logic to take the hours into account*@
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h5>Paid Time Off (PTO) Requests</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card" style="max-width: 80%;">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-light"><b>Generate Paid Time Off Request</b></li>
+                    <li class="list-group-item" @onclick="SetVacationMode">Vacation Hours: <strong>@Employee?.VacationHours</strong></li>
+                    <li class="list-group-item" @onclick="SetSickMode">Sick Hours:  <strong>@Employee?.SickHours</strong></li>
+                </ul>
+                <div class="card-body">
+                    <div class="row mb-">
+                        <div class="col">
+                            <h6 class="card-title"><strong>Request Type</strong></h6>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <div class="btn-group">
+                                    <button class="btn @VacationModeActive" @onclick=SetVacationMode>Vacation Time</button>
+                                    <button class="btn @SickModeActive" @onclick=SetSickMode>Sick Time</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2 mb-4">
+                        <div class="col">
+                            <div>
+                                <span>Does timespan include weekend days?: </span>
+                                <InputCheckbox @bind-Value=@isWeekendTime />
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="card-title"><strong>Time Request Range</strong></h6>
+                    <div class="row m-3">
+                        <div class="col">
+                            <span>Start Date</span>
+                            <input type="date" value="@StartDate?.ToString("yyyy-MM-dd")" @onchange="@(async (e) => UpdateStartDate(DateTime.Parse(e.Value.ToString())))" />
+                        </div>
+                        <div class="col">
+                            <span>Selected start date - <strong>@StartDate?.Date.ToShortDateString()</strong></span>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <span>End Date</span>
+                            <input type="date" value="@EndDate?.ToString("yyyy-MM-dd")" @onchange="@(async (e) => UpdateEndDate(DateTime.Parse(e.Value.ToString())))" />
+                        </div>
+                        <div class="col">
+                            <span>Selected end date - <strong>@EndDate?.Date.ToShortDateString()</strong></span>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <span>Days requested: <strong>@DaysRequested?.Days</strong></span>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <span>Hours to be used: <strong>@TotalRequestedHours</strong></span>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <span><br /></span>
+                            <span><b style="color: red;">@WarningMessage</b></span>
+                        </div>
+                        <div class="col">
+                            @if(isValid)
+                            {
+                                <button class="btn btn-primary" @onclick="HandleSubmit">Initiate Request</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @if(Employee != null)
+            {
+                @foreach (var request in Employee?.PTORequests)
+                {
+                    <div class="card mt-2 mb-2" style="max-width: 50%;">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-light"><b>Pending Request</b></li>
+                            <li class="list-group-item"><span><b>Request Type: </b>@if (request.isVacationTime) { <span>Vacation time</span> } else { <span>Sick time</span> }</span></li>
+                            <li class="list-group-item"><span><b>Start Date:</b> @request.StartTime</span></li>
+                            <li class="list-group-item"><span><b>End Date:</b> @request.EndTime</span></li>
+                            <li class="list-group-item"><span><b>Approval:</b> @request.isApproved</span></li>
+                        </ul>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public Employee? Employee { get; set; }
+
+    protected DateTime? StartDate;
+    protected DateOnly? Start;
+    protected DateTime? EndDate;
+
+    TimeSpan? DaysRequested;
+
+    bool isValid = true;
+    bool isSickTime = false;
+
+    int TotalRequestedHours = 0;
+
+    PTORequest NewRequest = new PTORequest();
+    string VacationModeActive = "btn-primary";
+    string SickModeActive = "btn-secondary";
+    string RequestButtonText = "Create vacation request";
+    bool isWeekendTime = false;
+
+    string WarningMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isValid = false;
+    }
+
+    protected void UpdateStartDate(DateTime? date)
+    {
+        if(date != null)
+        {
+            StartDate = date;
+            UpdateRequestedDays();
+        }
+    }
+
+    protected void UpdateEndDate(DateTime? date)
+    {
+        if (date != null)
+        {
+            EndDate = date;
+            UpdateRequestedDays();
+        }
+    }
+
+    protected void UpdateRequestedDays()
+    {
+        if (StartDate == null || EndDate == null)
+            return;         
+
+        if(EndDate > StartDate)
+        {
+            TimeSpan offset = new TimeSpan(1, 0, 0, 0);
+            DaysRequested = EndDate - StartDate + offset;
+            WarningMessage = string.Empty;
+            isValid = true;
+            WarningMessage = string.Empty;
+
+            CheckAvailableTime(DaysRequested.Value.Days);
+        }
+        else if(EndDate == StartDate)
+        {
+            DaysRequested = new TimeSpan(1, 0, 0, 0);
+            isValid = true;
+            WarningMessage = string.Empty;
+            CheckAvailableTime(DaysRequested.Value.Days);
+        }
+        else
+        {
+            DaysRequested = new TimeSpan();
+            isValid = false;
+            WarningMessage = "End date must be after the start date!";
+            CheckAvailableTime(DaysRequested.Value.Days);
+        }
+    }
+
+    private void HandleSubmit()
+    {
+        if(isValid)
+        {
+            Random rand = new Random();
+
+            NewRequest.Id = rand.Next();
+            NewRequest.StartTime = StartDate;
+            NewRequest.EndTime = EndDate;
+            NewRequest.isApproved = false;
+            NewRequest.isVacationTime = !isSickTime;
+            NewRequest.hasWeekendTime = isWeekendTime;
+
+            Employee?.PTORequests.Add(NewRequest);
+            NewRequest = new PTORequest();
+
+            if(isSickTime && Employee != null)
+            {
+                Employee.SickHours -= TotalRequestedHours;
+            }
+            else if(Employee != null)
+            {
+                Employee.VacationHours -= TotalRequestedHours;
+            }
+        }
+        else
+        {
+            isValid = false;
+            WarningMessage = "Invalid request";
+        }
+    }
+
+    private void SetVacationMode()
+    {
+        NewRequest.isVacationTime = true;
+        isSickTime = false;
+        VacationModeActive = "btn-primary";
+        SickModeActive = "btn-secondary";
+    }
+
+    private void SetSickMode()
+    {
+        NewRequest.isVacationTime = false;
+        isSickTime = true;
+        VacationModeActive = "btn-secondary";
+        SickModeActive = "btn-primary";
+    }
+
+    private void CheckAvailableTime(int days)
+    {
+        TotalRequestedHours = 0;
+        int workdayHours = 8;
+        int RequestedHours = days * workdayHours;
+
+        if (Employee == null)
+            return;
+
+        if (isSickTime && RequestedHours <= Employee?.SickHours)
+        {
+            TotalRequestedHours = RequestedHours;
+            isValid = true;
+        }
+        else if(RequestedHours <= Employee?.VacationHours)
+        {
+            TotalRequestedHours = RequestedHours;
+            isValid = true;
+        }
+        else
+        {
+            TotalRequestedHours = RequestedHours;
+            isValid = false;
+            WarningMessage = "Not enough hours available for new request!";
+        }
+    }
+}

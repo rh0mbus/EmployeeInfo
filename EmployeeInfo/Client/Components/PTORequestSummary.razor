@@ -1,0 +1,30 @@
+﻿@if (PTORequests?.Count() <= 0)
+{
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">
+            <h5 class="card-title">PTO Requests Summary</h5>
+        </div>
+        <div class="card-body">
+            <span>You have no outstanding paid time off reqeusts</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">
+            <h5 class="card-title">PTO Requests Summary</h5>
+        </div>
+        <div class="card-body">
+            <p>
+                You have <bold class="fw-bold" style="color:red;">@PTORequests?.Count</bold> time request you must address.
+            </p>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public List<PTORequest>? PTORequests { get; set; }
+}
